@@ -6,6 +6,8 @@ import (
 	"embed"
 	"io/fs"
 	"os"
+	"runtime/debug"
+	"strings"
 
 	"github.com/XiaoXianThis/wokspace/apps/wok/internal/cli"
 )
@@ -19,6 +21,12 @@ var templateFS embed.FS
 var version = "dev"
 
 func main() {
+	// `go install ...@vX.Y.Z` does not apply ldflags; take the module version.
+	if version == "dev" {
+		if info, ok := debug.ReadBuildInfo(); ok && strings.HasPrefix(info.Main.Version, "v") {
+			version = strings.TrimPrefix(info.Main.Version, "v")
+		}
+	}
 	tmpl, err := fs.Sub(templateFS, "template")
 	if err != nil {
 		panic(err)

@@ -26,6 +26,12 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Go modules in subdirectories need prefixed tags for
+      # `go install github.com/XiaoXianThis/wokspace/apps/wok@latest`.
+      - name: Tag the Go module
+        run: |
+          git tag "apps/wok/${GITHUB_REF_NAME}" "${GITHUB_SHA}"
+          git push origin "apps/wok/${GITHUB_REF_NAME}"
 
   npm:
     needs: binaries
