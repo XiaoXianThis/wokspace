@@ -1,0 +1,52 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  wok:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: apps/wok/go.mod
+          cache-dependency-path: apps/wok/go.mod
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Root AGENTS.md matches the template
+        run: cmp AGENTS.md apps/wok/template/AGENTS.md
+
+      - name: Build wok
+        working-directory: apps/wok
+        run: go build -o ../../build/wok/ .
+
+      - name: Test every app through wok
+        run: build/wok/wok test --all
+
+      - name: Check this repository's layout
+        run: build/wok/wok check
+
+      - name: Smoke test init, new, ls, check
+        run: |
+          wok="$PWD/build/wok/wok"
+          cd "$RUNNER_TEMP"
+          "$wok" init smoke
+          cd smoke
+          "$wok" new web
+          "$wok" ls web
+          "$wok" check

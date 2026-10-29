@@ -1,0 +1,37 @@
+# Release builds for wok. Run from apps/wok/; CI runs it on v* tags.
+version: 2
+
+project_name: wok
+dist: ../../build/wok/dist
+
+builds:
+  - id: wok
+    main: .
+    binary: wok
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X main.version={{ .Version }}
+    goos: [darwin, linux, windows]
+    goarch: [amd64, arm64]
+
+# Raw binaries with stable names, so install scripts and the npm package can
+# download releases/latest/download/wok_<os>_<arch>[.exe] directly.
+archives:
+  - id: binaries
+    formats: [binary]
+    name_template: "wok_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: checksums.txt
+
+changelog:
+  use: github
+  sort: asc
+
+release:
+  github:
+    owner: XiaoXianThis
+    name: wokspace

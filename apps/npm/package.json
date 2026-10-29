@@ -1,0 +1,26 @@
+{
+  "name": "wokspace",
+  "version": "0.0.0",
+  "description": "wok: create and run wokspaces, agent-first repositories for any stack",
+  "keywords": ["agents", "ai", "monorepo", "workspace", "cli", "scaffold", "agents-md"],
+  "homepage": "https://wokspace.wxian.cc",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/XiaoXianThis/wokspace.git",
+    "directory": "apps/npm"
+  },
+  "bugs": "https://github.com/XiaoXianThis/wokspace/issues",
+  "license": "MIT",
+  "bin": {
+    "wok": "bin/wok.js"
+  },
+  "files": [
+    "bin"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --check bin/wok.js"
+  }
+}
