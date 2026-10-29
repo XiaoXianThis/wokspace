@@ -14,7 +14,7 @@ Each subdirectory is an independent app that follows its own language's conventi
 | app | purpose | stack | depends on |
 |---|---|---|---|
 | wok | the `wok` CLI and the embedded wokspace template | Go | none |
-| npm | the `wokspace` npm package, for `npx wokspace` | Node.js | wok (release binaries) |
+| site | the website at wokspace.wxian.cc and the install scripts | static HTML | wok (release binaries) |
 
 ## App AGENTS.md template
 

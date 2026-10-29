@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en" data-root="..">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wokspace: an agent-first repository layout</title>
+  <meta name="description" content="Wokspace is a repository layout for AI agents that works with any language and stack. The wok CLI creates wokspaces, runs app tasks, and checks the layout.">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="alternate" hreflang="zh-CN" href="../">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <a class="brand" href="./">wok<span>space</span></a>
+      <nav>
+        <a href="#start">Get started</a>
+        <a class="hide-sm" href="#tasks">Tasks</a>
+        <a class="hide-sm" href="https://github.com/XiaoXianThis/wokspace/blob/main/AGENTS.md">Spec</a>
+        <a href="https://github.com/XiaoXianThis/wokspace">GitHub</a>
+        <a href="../" hreflang="zh-CN">中文</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap hero">
+      <h1>An agent-first repository layout<br><em>One wok, any stack.</em></h1>
+      <p class="lead">npm, Cargo, and Go put one language's project at the top of the repository. Agents work across stacks, and without firm rules they scatter files until the repository is a mess. Wokspace puts a workspace at the top and gives every file a definite place.</p>
+
+      <div class="tabs" role="tablist">
+        <button type="button" data-tab="unix">macOS / Linux</button>
+        <button type="button" data-tab="windows">Windows</button>
+      </div>
+      <div class="code" data-panel="unix"><pre><code data-install="sh">curl -fsSL https://raw.githubusercontent.com/XiaoXianThis/wokspace/main/apps/site/public/install.sh | sh</code></pre></div>
+      <div class="code" data-panel="windows" hidden><pre><code data-install="ps1">irm https://raw.githubusercontent.com/XiaoXianThis/wokspace/main/apps/site/public/install.ps1 | iex</code></pre></div>
+      <p class="note">The install scripts verify SHA-256 checksums. Binaries for every platform are also on the <a href="https://github.com/XiaoXianThis/wokspace/releases">releases page</a>.</p>
+    </div>
+
+    <section>
+      <div class="wrap">
+        <h2>A workspace at the top, not a project</h2>
+        <div class="code"><pre>AGENTS.md        <span class="c">the rules every agent reads first</span>
+apps/            <span class="c">independent projects, each in its own language's native layout</span>
+build/           <span class="c">final build output (not committed)</span>
+docs/            <span class="c">long-lived facts: architecture, decisions, guides, API contracts</span>
+work/            <span class="c">everything else: specs, scripts, tests, assets, infra, scratch space</span></pre></div>
+        <div class="grid">
+          <div class="card"><h3>A frozen root</h3><p>Three committed files and four directories. A whitelist <code>.gitignore</code> keeps everything else out of git, including <code>.cursor/</code>, <code>.kiro/</code>, and <code>.claude/</code>.</p></div>
+          <div class="card"><h3>A frozen skeleton</h3><p>Every directory exists from day one with a README of its rules, so agents know where a file goes before they write it.</p></div>
+          <div class="card"><h3>Any stack, side by side</h3><p>Each app in <code>apps/</code> is a normal Go, Rust, Node, Python, .NET, or Java project. Apps never share source.</p></div>
+          <div class="card"><h3>Works without a tool</h3><p>The rules are plain Markdown. <code>wok</code> only speeds things up: create, run tasks from the root, check the rules.</p></div>
+          <div class="card"><h3>Convention over configuration</h3><p>No config file. Task commands live in each app's <code>AGENTS.md</code>; empty cells are detected.</p></div>
+          <div class="card"><h3>Every platform</h3><p>Naming rules, line endings, and commands work on Windows, macOS, and Linux.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="start">
+      <div class="wrap">
+        <h2>Get started</h2>
+        <div class="code"><pre>wok init my-project          <span class="c"># the full skeleton, plus git init</span>
+cd my-project
+wok new web                  <span class="c"># apps/web/AGENTS.md, listed in apps/README.md</span>
+cd apps/web
+npm create vite@latest .
+cd ../..
+wok dev web                  <span class="c"># runs npm run dev in apps/web/</span></pre></div>
+        <p>Or ask your agent: "Create a web app with Vite." The rules in <code>AGENTS.md</code> tell it to run <code>wok new web</code>, initialize the app inside <code>apps/web/</code>, fill in the task table, and run <code>wok check</code> before it finishes.</p>
+
+        <h3>Commands</h3>
+        <div class="code"><pre>wok init [dir]                 <span class="c"># create a wokspace; --existing adds missing files to a non-empty directory</span>
+wok new &lt;app&gt;                  <span class="c"># create apps/&lt;app&gt;/ with its AGENTS.md</span>
+wok dev [app...]               <span class="c"># start apps; several run in parallel with labeled output</span>
+wok build [app...] [--all]     <span class="c"># build apps into build/&lt;app&gt;/</span>
+wok test [app...] [--all]      <span class="c"># test apps</span>
+wok install [app...] [--all]   <span class="c"># install app dependencies</span>
+wok run &lt;app&gt; &lt;task&gt; [-- args] <span class="c"># run any task</span>
+wok ls [app]                   <span class="c"># list apps and the command behind each task</span>
+wok check                      <span class="c"># check the layout against AGENTS.md</span></pre></div>
+        <p>wok works from any directory inside a wokspace. Inside <code>apps/&lt;app&gt;/</code>, the app name can be left out.</p>
+      </div>
+    </section>
+
+    <section id="tasks">
+      <div class="wrap">
+        <h2>Tasks: convention first, config if needed</h2>
+        <p>Each app's <code>AGENTS.md</code> has a task table that humans, agents, and wok all read. An empty command means "use what wok detects"; <code>wok ls</code> shows the result and where each command came from.</p>
+        <div class="code"><pre>| task    | command                                              | windows |
+|---------|------------------------------------------------------|---------|
+| install |                                                      |         |
+| dev     |                                                      |         |
+| test    | cargo test --all-features                            |         |
+| build   | cargo build --release &amp;&amp; cp target/release/api "$WOK_OUT" | cargo build --release &amp;&amp; copy target\release\api.exe "$WOK_OUT" |</pre></div>
+
+        <h3>Detection</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>project file</th><th>install</th><th>dev</th><th>test</th><th>build</th></tr></thead>
+            <tbody>
+              <tr><td><code>package.json</code><br><span class="note">npm, pnpm, yarn, or bun, chosen from the lock file</span></td><td><code>&lt;pm&gt; install</code></td><td><code>&lt;pm&gt; run dev</code></td><td><code>&lt;pm&gt; run test</code></td><td><code>&lt;pm&gt; run build</code></td></tr>
+              <tr><td><code>deno.json</code></td><td><code>deno install</code></td><td><code>deno task dev</code></td><td><code>deno task test</code></td><td><code>deno task build</code></td></tr>
+              <tr><td><code>Cargo.toml</code></td><td><code>cargo fetch</code></td><td><code>cargo run</code></td><td><code>cargo test</code></td><td><code>cargo build --release</code></td></tr>
+              <tr><td><code>go.mod</code></td><td><code>go mod download</code></td><td><code>go run .</code></td><td><code>go test ./...</code></td><td><code>go build -o "$WOK_OUT" .</code></td></tr>
+              <tr><td><code>*.sln</code> <code>*.csproj</code> <code>*.fsproj</code></td><td><code>dotnet restore</code></td><td><code>dotnet run</code></td><td><code>dotnet test</code></td><td><code>dotnet publish -c Release -o "$WOK_OUT"</code></td></tr>
+              <tr><td><code>gradlew</code> <code>build.gradle(.kts)</code></td><td></td><td></td><td><code>gradlew test</code></td><td><code>gradlew build</code></td></tr>
+              <tr><td><code>pom.xml</code></td><td><code>mvn dependency:resolve</code></td><td></td><td><code>mvn test</code></td><td><code>mvn package</code></td></tr>
+              <tr><td><code>pyproject.toml</code> + <code>uv.lock</code></td><td><code>uv sync</code></td><td></td><td><code>uv run pytest</code></td><td><code>uv build --out-dir "$WOK_OUT"</code></td></tr>
+              <tr><td><code>pyproject.toml</code> + <code>poetry.lock</code></td><td><code>poetry install</code></td><td></td><td><code>poetry run pytest</code></td><td><code>poetry build</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Every <code>package.json</code> script and <code>deno.json</code> task becomes a task too, so <code>wok run web lint</code> works without a table row.</p>
+        <p>Commands run in the app directory, through <code>sh</code> on macOS and Linux and <code>cmd</code> on Windows. Before a command runs, wok replaces <code>$WOK_ROOT</code>, <code>$WOK_APP</code>, and <code>$WOK_OUT</code> (the app's <code>build/&lt;app&gt;/</code> directory) on every platform, and also sets them as environment variables.</p>
+      </div>
+    </section>
+
+    <section id="agents">
+      <div class="wrap">
+        <h2>Living with every agent</h2>
+        <p><code>AGENTS.md</code> is the only committed rule entry point. Kiro, Codex, Cursor, GitHub Copilot, and others read it directly. For Claude Code, create a local <code>CLAUDE.md</code> containing the single line <code>@AGENTS.md</code>.</p>
+        <p>Agent tool directories stay out of git. Configs a team wants to share (MCP servers, hooks, ...) are kept as standard versions in <code>work/agent/configs/</code> and copied locally. Kiro specs can be linked from <code>.kiro/specs</code> to <code>work/specs/</code>; on Windows a directory junction needs no admin rights.</p>
+        <p>The full rules are in <a href="https://github.com/XiaoXianThis/wokspace/blob/main/AGENTS.md">AGENTS.md</a>; the trade-offs are in the <a href="https://github.com/XiaoXianThis/wokspace/tree/main/docs/decisions">decision records</a>.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>Wokspace · MIT License</span>
+      <span><a href="https://github.com/XiaoXianThis/wokspace">GitHub</a> · <a href="https://github.com/XiaoXianThis/wokspace/releases">Releases</a> · <a href="../" hreflang="zh-CN">中文</a></span>
+    </div>
+  </footer>
+  <script src="../main.js"></script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 #!/bin/sh
 # Install wok on macOS or Linux.
 #
-#   curl -fsSL https://raw.githubusercontent.com/XiaoXianThis/wokspace/main/apps/wok/install/install.sh | sh
+#   curl -fsSL https://wokspace.wxian.cc/install.sh | sh
 #
 # Environment:
 #   WOK_VERSION      release tag to install, such as v0.1.0 (default: latest)

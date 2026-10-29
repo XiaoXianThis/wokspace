@@ -2,7 +2,7 @@
 
 **为 Agent 设计的项目结构，适用于任何技术栈。One wok, any stack.**
 
-[English](README.md) · [规范（AGENTS.md）](../AGENTS.md) · [决策记录](decisions/README.md)
+[English](README.md) · [网站](https://wokspace.wxian.cc) · [规范（AGENTS.md）](../AGENTS.md) · [决策记录](decisions/README.md)
 
 npm、Cargo、Go、Gradle 这些工具都把某一种语言的工程放在仓库顶层。这适合只用一种技术栈的人。Agent 会同时在多种技术栈之间工作，没有明确规则时会到处建文件和目录，时间一长，仓库就乱了。
 
@@ -27,18 +27,16 @@ work/            其余一切：spec、脚本、测试、素材、基础设施�
 macOS / Linux：
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/XiaoXianThis/wokspace/main/apps/wok/install/install.sh | sh
+curl -fsSL https://wokspace.wxian.cc/install.sh | sh
 ```
 
 Windows（PowerShell）：
 
 ```powershell
-irm https://raw.githubusercontent.com/XiaoXianThis/wokspace/main/apps/wok/install/install.ps1 | iex
+irm https://wokspace.wxian.cc/install.ps1 | iex
 ```
 
-有 Node.js 时可以免安装：`npx wokspace <命令>`。有 Go 时：`go install github.com/XiaoXianThis/wokspace/apps/wok@latest`。
-
-各平台的预编译文件见 [Releases 页面](https://github.com/XiaoXianThis/wokspace/releases)。
+安装脚本会校验 SHA-256。也可以从 [Releases 页面](https://github.com/XiaoXianThis/wokspace/releases)直接下载各平台的预编译文件。
 
 ## 快速开始
 
@@ -96,7 +94,7 @@ wok 没有配置文件。每个 app 的 `AGENTS.md` 里有一张任务表，人�
 | app | 内容 |
 |---|---|
 | [`apps/wok`](../apps/wok/AGENTS.md) | Go 写的命令行工具，模板在 `apps/wok/template/` |
-| [`apps/npm`](../apps/npm/AGENTS.md) | `wokspace` npm 包，负责下载命令行工具 |
+| [`apps/site`](../apps/site/AGENTS.md) | 项目网站 [wokspace.wxian.cc](https://wokspace.wxian.cc) 和安装脚本 |
 
 根目录的 `AGENTS.md` 就是规范本身，和 `wok init` 生成的完全一致。
 

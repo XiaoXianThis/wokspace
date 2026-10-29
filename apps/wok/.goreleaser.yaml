@@ -17,7 +17,7 @@ builds:
     goos: [darwin, linux, windows]
     goarch: [amd64, arm64]
 
-# Raw binaries with stable names, so install scripts and the npm package can
+# Raw binaries with stable names, so the install scripts in apps/site can
 # download releases/latest/download/wok_<os>_<arch>[.exe] directly.
 archives:
   - id: binaries

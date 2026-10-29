@@ -1,6 +1,6 @@
 # Install wok on Windows.
 #
-#   irm https://raw.githubusercontent.com/XiaoXianThis/wokspace/main/apps/wok/install/install.ps1 | iex
+#   irm https://wokspace.wxian.cc/install.ps1 | iex
 #
 # Environment:
 #   WOK_VERSION      release tag to install, such as v0.1.0 (default: latest)

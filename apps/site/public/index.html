@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="zh-CN" data-root=".">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wokspace：为 Agent 设计的项目结构</title>
+  <meta name="description" content="Wokspace 是一套为 AI Agent 设计的仓库结构规范，适用于任何语言和技术栈；wok 命令行工具负责创建项目、运行任务和检查结构。">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="alternate" hreflang="en" href="en/">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <a class="brand" href="./">wok<span>space</span></a>
+      <nav>
+        <a href="#start">快速开始</a>
+        <a class="hide-sm" href="#tasks">任务</a>
+        <a class="hide-sm" href="https://github.com/XiaoXianThis/wokspace/blob/main/AGENTS.md">规范</a>
+        <a href="https://github.com/XiaoXianThis/wokspace">GitHub</a>
+        <a href="en/" hreflang="en">English</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap hero">
+      <h1>为 Agent 设计的项目结构<br><em>One wok, any stack.</em></h1>
+      <p class="lead">npm、Cargo、Go 都把某一种语言的工程放在仓库顶层。Agent 会同时在多种技术栈之间工作，没有明确规则时会到处建文件，仓库很快就乱了。Wokspace 让顶层变成工作区，给每个文件一个确定的位置。</p>
+
+      <div class="tabs" role="tablist">
+        <button type="button" data-tab="unix">macOS / Linux</button>
+        <button type="button" data-tab="windows">Windows</button>
+      </div>
+      <div class="code" data-panel="unix"><pre><code data-install="sh">curl -fsSL https://raw.githubusercontent.com/XiaoXianThis/wokspace/main/apps/site/public/install.sh | sh</code></pre></div>
+      <div class="code" data-panel="windows" hidden><pre><code data-install="ps1">irm https://raw.githubusercontent.com/XiaoXianThis/wokspace/main/apps/site/public/install.ps1 | iex</code></pre></div>
+      <p class="note">安装脚本会校验 SHA-256。也可以从 <a href="https://github.com/XiaoXianThis/wokspace/releases">Releases 页面</a>直接下载各平台的二进制文件。</p>
+    </div>
+
+    <section>
+      <div class="wrap">
+        <h2>顶层是工作区，不是工程</h2>
+        <div class="code"><pre>AGENTS.md        <span class="c">所有 Agent 首先读取的规则</span>
+apps/            <span class="c">独立的子项目，各自使用自己语言的原生结构</span>
+build/           <span class="c">最终构建产物（不提交）</span>
+docs/            <span class="c">长期有效的事实：架构、决策、指南、接口契约</span>
+work/            <span class="c">其余一切：spec、脚本、测试、素材、基础设施、临时区</span></pre></div>
+        <div class="grid">
+          <div class="card"><h3>根目录冻结</h3><p>只提交 3 个文件和 4 个目录。白名单式的 <code>.gitignore</code> 把其他东西挡在 git 之外，包括 <code>.cursor/</code>、<code>.kiro/</code>、<code>.claude/</code>。</p></div>
+          <div class="card"><h3>骨架冻结</h3><p>所有目录从第一天起就存在，每个目录都有写明规则的 README。Agent 写文件之前就知道该放哪里。</p></div>
+          <div class="card"><h3>多技术栈并存</h3><p><code>apps/</code> 里每个 app 都是普通的 Go、Rust、Node、Python、.NET 或 Java 工程，互不引用源码。</p></div>
+          <div class="card"><h3>不依赖工具也能运转</h3><p>规则是纯 Markdown。<code>wok</code> 只是加速器：创建项目、在根目录运行任务、检查规则。</p></div>
+          <div class="card"><h3>约定优于配置</h3><p>没有配置文件。任务命令写在每个 app 的 <code>AGENTS.md</code> 里，留空就自动识别。</p></div>
+          <div class="card"><h3>三个平台都能用</h3><p>命名规则、换行符和命令都按 Windows、macOS、Linux 通用的标准来定。</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="start">
+      <div class="wrap">
+        <h2>快速开始</h2>
+        <div class="code"><pre>wok init my-project          <span class="c"># 生成完整骨架，并执行 git init</span>
+cd my-project
+wok new web                  <span class="c"># 生成 apps/web/AGENTS.md，并登记到 apps/README.md</span>
+cd apps/web
+npm create vite@latest .
+cd ../..
+wok dev web                  <span class="c"># 在 apps/web/ 中执行 npm run dev</span></pre></div>
+        <p>也可以直接告诉 Agent："用 Vite 建一个 web 应用。" <code>AGENTS.md</code> 的规则会让它执行 <code>wok new web</code>，在 <code>apps/web/</code> 里初始化工程，填写任务表，并在结束前执行 <code>wok check</code>。</p>
+
+        <h3>命令</h3>
+        <div class="code"><pre>wok init [dir]                 <span class="c"># 创建 wokspace；--existing 向非空目录补充缺失的文件</span>
+wok new &lt;app&gt;                  <span class="c"># 创建 apps/&lt;app&gt;/ 及其 AGENTS.md</span>
+wok dev [app...]               <span class="c"># 启动 app；多个 app 并行运行，输出带标签</span>
+wok build [app...] [--all]     <span class="c"># 构建 app，产物输出到 build/&lt;app&gt;/</span>
+wok test [app...] [--all]      <span class="c"># 测试 app</span>
+wok install [app...] [--all]   <span class="c"># 安装 app 的依赖</span>
+wok run &lt;app&gt; &lt;task&gt; [-- args] <span class="c"># 运行任意任务</span>
+wok ls [app]                   <span class="c"># 列出 app 以及每个任务背后的命令</span>
+wok check                      <span class="c"># 按 AGENTS.md 检查目录结构</span></pre></div>
+        <p>在 wokspace 内的任何目录都能使用 wok。在 <code>apps/&lt;app&gt;/</code> 里时，可以省略 app 名。</p>
+      </div>
+    </section>
+
+    <section id="tasks">
+      <div class="wrap">
+        <h2>任务：约定优先，必要时再配置</h2>
+        <p>每个 app 的 <code>AGENTS.md</code> 里有一张任务表，人、Agent 和 wok 都读这张表。命令留空表示使用 wok 自动识别的命令，<code>wok ls</code> 会显示最终结果和每条命令的来源。</p>
+        <div class="code"><pre>| task    | command                                              | windows |
+|---------|------------------------------------------------------|---------|
+| install |                                                      |         |
+| dev     |                                                      |         |
+| test    | cargo test --all-features                            |         |
+| build   | cargo build --release &amp;&amp; cp target/release/api "$WOK_OUT" | cargo build --release &amp;&amp; copy target\release\api.exe "$WOK_OUT" |</pre></div>
+
+        <h3>自动识别</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>工程文件</th><th>install</th><th>dev</th><th>test</th><th>build</th></tr></thead>
+            <tbody>
+              <tr><td><code>package.json</code><br><span class="note">按 lock 文件选择 npm、pnpm、yarn 或 bun</span></td><td><code>&lt;pm&gt; install</code></td><td><code>&lt;pm&gt; run dev</code></td><td><code>&lt;pm&gt; run test</code></td><td><code>&lt;pm&gt; run build</code></td></tr>
+              <tr><td><code>deno.json</code></td><td><code>deno install</code></td><td><code>deno task dev</code></td><td><code>deno task test</code></td><td><code>deno task build</code></td></tr>
+              <tr><td><code>Cargo.toml</code></td><td><code>cargo fetch</code></td><td><code>cargo run</code></td><td><code>cargo test</code></td><td><code>cargo build --release</code></td></tr>
+              <tr><td><code>go.mod</code></td><td><code>go mod download</code></td><td><code>go run .</code></td><td><code>go test ./...</code></td><td><code>go build -o "$WOK_OUT" .</code></td></tr>
+              <tr><td><code>*.sln</code> <code>*.csproj</code> <code>*.fsproj</code></td><td><code>dotnet restore</code></td><td><code>dotnet run</code></td><td><code>dotnet test</code></td><td><code>dotnet publish -c Release -o "$WOK_OUT"</code></td></tr>
+              <tr><td><code>gradlew</code> <code>build.gradle(.kts)</code></td><td></td><td></td><td><code>gradlew test</code></td><td><code>gradlew build</code></td></tr>
+              <tr><td><code>pom.xml</code></td><td><code>mvn dependency:resolve</code></td><td></td><td><code>mvn test</code></td><td><code>mvn package</code></td></tr>
+              <tr><td><code>pyproject.toml</code> + <code>uv.lock</code></td><td><code>uv sync</code></td><td></td><td><code>uv run pytest</code></td><td><code>uv build --out-dir "$WOK_OUT"</code></td></tr>
+              <tr><td><code>pyproject.toml</code> + <code>poetry.lock</code></td><td><code>poetry install</code></td><td></td><td><code>poetry run pytest</code></td><td><code>poetry build</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p><code>package.json</code> 的每个 script 和 <code>deno.json</code> 的每个 task 也会自动成为任务，所以不写表也能直接 <code>wok run web lint</code>。</p>
+        <p>命令在 app 目录中执行：macOS 和 Linux 通过 <code>sh</code>，Windows 通过 <code>cmd</code>。执行前，wok 会在所有平台上替换 <code>$WOK_ROOT</code>、<code>$WOK_APP</code> 和 <code>$WOK_OUT</code>（该 app 的 <code>build/&lt;app&gt;/</code> 目录），同时把它们设为环境变量。</p>
+      </div>
+    </section>
+
+    <section id="agents">
+      <div class="wrap">
+        <h2>和各家 Agent 共处</h2>
+        <p><code>AGENTS.md</code> 是唯一提交到仓库的规则入口。Kiro、Codex、Cursor、GitHub Copilot 等工具会直接读取它。Claude Code 需要在本地建一个 <code>CLAUDE.md</code>，内容只有一行 <code>@AGENTS.md</code>。</p>
+        <p>各家 Agent 的专属目录都不进 git。团队需要共享的配置（MCP、hooks 等）以标准版本放在 <code>work/agent/configs/</code>，每个人复制到本地。Kiro 的 spec 可以把 <code>.kiro/specs</code> 链接到 <code>work/specs/</code>，Windows 上用目录联接，不需要管理员权限。</p>
+        <p>完整规则见 <a href="https://github.com/XiaoXianThis/wokspace/blob/main/AGENTS.md">AGENTS.md</a>，设计取舍见<a href="https://github.com/XiaoXianThis/wokspace/tree/main/docs/decisions">决策记录</a>。</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>Wokspace · MIT License</span>
+      <span><a href="https://github.com/XiaoXianThis/wokspace">GitHub</a> · <a href="https://github.com/XiaoXianThis/wokspace/releases">Releases</a> · <a href="en/" hreflang="en">English</a></span>
+    </div>
+  </footer>
+  <script src="main.js"></script>
+</body>
+</html>

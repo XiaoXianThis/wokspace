@@ -6,7 +6,6 @@ on:
 
 permissions:
   contents: write
-  id-token: write
 
 jobs:
   binaries:
@@ -26,27 +25,3 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # Go modules in subdirectories need prefixed tags for
-      # `go install github.com/XiaoXianThis/wokspace/apps/wok@latest`.
-      - name: Tag the Go module
-        run: |
-          git tag "apps/wok/${GITHUB_REF_NAME}" "${GITHUB_SHA}"
-          git push origin "apps/wok/${GITHUB_REF_NAME}"
-
-  npm:
-    needs: binaries
-    runs-on: ubuntu-latest
-    if: ${{ vars.PUBLISH_NPM == 'true' }}
-    defaults:
-      run:
-        working-directory: apps/npm
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          registry-url: https://registry.npmjs.org
-      - run: npm version "${GITHUB_REF_NAME#v}" --no-git-tag-version
-      - run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

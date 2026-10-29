@@ -2,7 +2,7 @@
 
 **An agent-first repository layout for any stack. One wok, any stack.**
 
-[中文](README.zh-cn.md) · [Spec (AGENTS.md)](../AGENTS.md) · [Decisions](decisions/README.md)
+[中文](README.zh-cn.md) · [Website](https://wokspace.wxian.cc) · [Spec (AGENTS.md)](../AGENTS.md) · [Decisions](decisions/README.md)
 
 Package managers like npm, Cargo, Go, and Gradle put one language's project at the top of the repository. That suits a person working in one stack. Agents work across stacks, and without firm rules they scatter files and directories until the repository is a mess.
 
@@ -27,18 +27,16 @@ work/            everything else: specs, scripts, tests, assets, infra, scratch 
 macOS / Linux:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/XiaoXianThis/wokspace/main/apps/wok/install/install.sh | sh
+curl -fsSL https://wokspace.wxian.cc/install.sh | sh
 ```
 
 Windows (PowerShell):
 
 ```powershell
-irm https://raw.githubusercontent.com/XiaoXianThis/wokspace/main/apps/wok/install/install.ps1 | iex
+irm https://wokspace.wxian.cc/install.ps1 | iex
 ```
 
-With Node.js, no install: `npx wokspace <command>`. With Go: `go install github.com/XiaoXianThis/wokspace/apps/wok@latest`.
-
-Prebuilt binaries for every platform are on the [releases page](https://github.com/XiaoXianThis/wokspace/releases).
+The install scripts verify SHA-256 checksums. Prebuilt binaries for every platform are also on the [releases page](https://github.com/XiaoXianThis/wokspace/releases).
 
 ## Quick start
 
@@ -110,7 +108,7 @@ This repository is itself a wokspace:
 | app | what it is |
 |---|---|
 | [`apps/wok`](../apps/wok/AGENTS.md) | the Go CLI, with the template in `apps/wok/template/` |
-| [`apps/npm`](../apps/npm/AGENTS.md) | the `wokspace` npm package that downloads the CLI |
+| [`apps/site`](../apps/site/AGENTS.md) | the website at [wokspace.wxian.cc](https://wokspace.wxian.cc) and the install scripts |
 
 The root `AGENTS.md` is the spec, and it is identical to the one `wok init` writes.
 
