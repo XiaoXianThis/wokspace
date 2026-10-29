@@ -1,74 +1,74 @@
 # Wokspace
 
-**An agent-first repository layout for any stack. One wok, any stack.**
+**为 Agent 设计的项目结构，适用于任何技术栈。One wok, any stack.**
 
-[中文](README.zh-cn.md) · [Website](https://wokspace.wxian.cc) · [Spec (AGENTS.md)](../AGENTS.md) · [Decisions](decisions/README.md)
+[English](README.en.md) · [网站](https://wokspace.wxian.cc) · [规范（AGENTS.md）](../AGENTS.md) · [决策记录](decisions/README.md)
 
-Package managers like npm, Cargo, Go, and Gradle put one language's project at the top of the repository. That suits a person working in one stack. Agents work across stacks, and without firm rules they scatter files and directories until the repository is a mess.
+npm、Cargo、Go、Gradle 这些工具都把某一种语言的工程放在仓库顶层。这适合只用一种技术栈的人。Agent 会同时在多种技术栈之间工作，没有明确规则时会到处建文件和目录，时间一长，仓库就乱了。
 
-A **wokspace** puts a workspace at the top instead of a project:
+**wokspace** 的顶层是工作区，而不是某个工程：
 
 ```
-AGENTS.md        the rules every agent reads first
-apps/            independent projects, each in its own language's native layout
-build/           final build output (not committed)
-docs/            long-lived facts: architecture, decisions, guides, API contracts
-work/            everything else: specs, scripts, tests, assets, infra, scratch space
+AGENTS.md        所有 Agent 首先读取的规则
+apps/            独立的子项目，各自使用自己语言的原生结构
+build/           最终构建产物（不提交）
+docs/            长期有效的事实：架构、决策、指南、接口契约
+work/            其余一切：spec、脚本、测试、素材、基础设施、临时区
 ```
 
-- **A frozen root.** Three committed files and four directories. A whitelist `.gitignore` keeps everything else out of git, including every agent tool's private directory (`.cursor/`, `.kiro/`, `.claude/`, ...).
-- **A frozen skeleton.** Every directory exists from day one, and each has a README with its rules, so an agent always knows where a file goes before it writes one.
-- **Any stack, side by side.** Each app in `apps/` is a normal Go, Rust, Node, Python, .NET, or Java project. Apps never share source; they depend on each other's build output or on contracts in `docs/api/`.
-- **Works without a tool.** The rules are plain Markdown. The `wok` CLI only speeds things up: it creates wokspaces, runs app tasks from the root, and checks the rules.
-- **Windows, macOS, and Linux.** Naming rules, line endings, and commands are chosen to work everywhere.
+- **根目录冻结。** 只提交 3 个文件和 4 个目录。白名单式的 `.gitignore` 把其他东西都挡在 git 之外，包括各家 Agent 的专属目录（`.cursor/`、`.kiro/`、`.claude/` 等）。
+- **骨架冻结。** 所有目录从第一天起就存在，每个目录都有一份写明规则的 README，Agent 在写文件之前就知道该放在哪里。
+- **多技术栈并存。** `apps/` 里的每个 app 都是普通的 Go、Rust、Node、Python、.NET 或 Java 工程。app 之间不共享源码，只通过构建产物或 `docs/api/` 里的契约互相依赖。
+- **不依赖工具也能运转。** 规则是纯 Markdown。`wok` 命令行只是加速器：创建 wokspace、在根目录运行 app 的任务、检查规则。
+- **支持 Windows、macOS、Linux。** 命名规则、换行符和命令都按三个平台都能用的标准来定。
 
-## Install
+## 安装
 
-macOS / Linux:
+macOS / Linux：
 
 ```sh
 curl -fsSL https://wokspace.wxian.cc/install.sh | sh
 ```
 
-Windows (PowerShell):
+Windows（PowerShell）：
 
 ```powershell
 irm https://wokspace.wxian.cc/install.ps1 | iex
 ```
 
-The install scripts verify SHA-256 checksums. Prebuilt binaries for every platform are also on the [releases page](https://github.com/XiaoXianThis/wokspace/releases).
+安装脚本会校验 SHA-256。也可以从 [Releases 页面](https://github.com/XiaoXianThis/wokspace/releases)直接下载各平台的预编译文件。
 
-## Quick start
+## 快速开始
 
 ```sh
-wok init my-project          # the full skeleton, plus git init
+wok init my-project          # 生成完整骨架，并执行 git init
 cd my-project
-wok new web                  # apps/web/AGENTS.md, listed in apps/README.md
+wok new web                  # 生成 apps/web/AGENTS.md，并登记到 apps/README.md
 cd apps/web && npm create vite@latest . && cd ../..
-wok dev web                  # runs `npm run dev` in apps/web/
+wok dev web                  # 在 apps/web/ 中执行 npm run dev
 ```
 
-Or ask your agent: "Create a web app with Vite." The rules in `AGENTS.md` tell it to run `wok new web`, initialize the app inside `apps/web/`, fill in the task table, and run `wok check` before it finishes.
+也可以直接告诉 Agent："用 Vite 建一个 web 应用。" `AGENTS.md` 的规则会让它执行 `wok new web`，在 `apps/web/` 里初始化工程，填写任务表，并在结束前执行 `wok check`。
 
-## Commands
+## 命令
 
 ```
-wok init [dir]                 create a wokspace (--existing adds missing files to a non-empty directory)
-wok new <app>                  create apps/<app>/ with its AGENTS.md
-wok dev [app...]               start apps; several run in parallel with labeled output
-wok build [app...] [--all]     build apps into build/<app>/
-wok test [app...] [--all]      test apps
-wok install [app...] [--all]   install app dependencies
-wok run <app> <task> [-- args] run any task
-wok ls [app]                   list apps and the command behind each task
-wok check                      check the layout against AGENTS.md
+wok init [dir]                 创建 wokspace（--existing 向非空目录补充缺失的文件）
+wok new <app>                  创建 apps/<app>/ 及其 AGENTS.md
+wok dev [app...]               启动 app；多个 app 并行运行，输出带标签
+wok build [app...] [--all]     构建 app，产物输出到 build/<app>/
+wok test [app...] [--all]      测试 app
+wok install [app...] [--all]   安装 app 的依赖
+wok run <app> <task> [-- args] 运行任意任务
+wok ls [app]                   列出 app 以及每个任务背后的命令
+wok check                      按 AGENTS.md 检查目录结构
 ```
 
-wok works from any directory inside a wokspace. Inside `apps/<app>/`, the app name can be left out.
+在 wokspace 内的任何目录都能使用 wok。在 `apps/<app>/` 里时，可以省略 app 名。
 
-## Tasks: convention first, config if needed
+## 任务：约定优先，必要时再配置
 
-There is no wok config file. Each app's `AGENTS.md` has a task table that humans, agents, and wok all read:
+wok 没有配置文件。每个 app 的 `AGENTS.md` 里有一张任务表，人、Agent 和 wok 都读这张表：
 
 ```markdown
 | task | command | windows |
@@ -79,39 +79,25 @@ There is no wok config file. Each app's `AGENTS.md` has a task table that humans
 | build | cargo build --release && cp target/release/api "$WOK_OUT" | cargo build --release && copy target\release\api.exe "$WOK_OUT" |
 ```
 
-An empty command means "use what wok detects". `wok ls` shows the result and where each command came from.
+命令留空表示"使用 wok 自动识别的命令"。`wok ls` 会显示最终结果，以及每条命令的来源。自动识别规则见[英文版](README.en.md#tasks-convention-first-config-if-needed)中的表格：支持 Node（npm、pnpm、yarn、bun）、Deno、Cargo、Go、.NET、Gradle、Maven，以及使用 uv 或 Poetry 的 Python 项目。`package.json` 的每个 script 和 `deno.json` 的每个 task 也会自动成为任务，所以不写表也能直接 `wok run web lint`。
 
-| project file | install | dev | test | build |
-|---|---|---|---|---|
-| `package.json` (npm, pnpm, yarn, or bun, chosen from the lock file) | `<pm> install` | `<pm> run dev` | `<pm> run test` | `<pm> run build` |
-| `deno.json` | `deno install` | `deno task dev` | `deno task test` | `deno task build` |
-| `Cargo.toml` | `cargo fetch` | `cargo run` | `cargo test` | `cargo build --release` |
-| `go.mod` | `go mod download` | `go run .` | `go test ./...` | `go build -o "$WOK_OUT" .` |
-| `*.sln`, `*.csproj`, `*.fsproj` | `dotnet restore` | `dotnet run` | `dotnet test` | `dotnet publish -c Release -o "$WOK_OUT"` |
-| `gradlew`, `build.gradle(.kts)` | | | `gradlew test` | `gradlew build` |
-| `pom.xml` | `mvn dependency:resolve` | | `mvn test` | `mvn package` |
-| `pyproject.toml` + `uv.lock` | `uv sync` | | `uv run pytest` | `uv build --out-dir "$WOK_OUT"` |
-| `pyproject.toml` + `poetry.lock` | `poetry install` | | `poetry run pytest` | `poetry build` |
+命令在 app 目录中执行：macOS 和 Linux 通过 `sh`，Windows 通过 `cmd`。执行前，wok 会在所有平台上替换 `$WOK_ROOT`、`$WOK_APP` 和 `$WOK_OUT`（该 app 的 `build/<app>/` 目录），同时把它们设为环境变量。
 
-Every `package.json` script and `deno.json` task becomes a task too, so `wok run web lint` works without any table row.
+## Agent
 
-Commands run in the app directory, through `sh` on macOS and Linux and `cmd` on Windows. Before a command runs, wok replaces `$WOK_ROOT`, `$WOK_APP`, and `$WOK_OUT` (the app's `build/<app>/` directory) on every platform, and also sets them as environment variables.
+大多数 Agent 工具会直接读取 `AGENTS.md`，例如 Kiro、Codex、Cursor、GitHub Copilot。Claude Code 需要在本地建一个 `CLAUDE.md`，内容是 `@AGENTS.md`。Agent 工具的目录都不进 git；团队需要共享的配置放在 `work/agent/configs/`。详见新建 wokspace 中 `docs/README.md` 的 Agent setup 一节。
 
-## Agents
+## 本仓库
 
-Most agent tools read `AGENTS.md` directly: Kiro, Codex, Cursor, GitHub Copilot, and others. For Claude Code, create a local `CLAUDE.md` containing `@AGENTS.md`. Agent tool directories stay out of git; configs a team wants to share go to `work/agent/configs/`. See the agent setup section in a new wokspace's `docs/README.md`.
+本仓库本身就是一个 wokspace：
 
-## This repository
-
-This repository is itself a wokspace:
-
-| app | what it is |
+| app | 内容 |
 |---|---|
-| [`apps/wok`](../apps/wok/AGENTS.md) | the Go CLI, with the template in `apps/wok/template/` |
-| [`apps/site`](../apps/site/AGENTS.md) | the website at [wokspace.wxian.cc](https://wokspace.wxian.cc) and the install scripts |
+| [`apps/wok`](../apps/wok/AGENTS.md) | Go 写的命令行工具，模板在 `apps/wok/template/` |
+| [`apps/site`](../apps/site/AGENTS.md) | 项目网站 [wokspace.wxian.cc](https://wokspace.wxian.cc) 和安装脚本 |
 
-The root `AGENTS.md` is the spec, and it is identical to the one `wok init` writes.
+根目录的 `AGENTS.md` 就是规范本身，和 `wok init` 生成的完全一致。
 
-## License
+## 许可证
 
 [MIT](../LICENSE)
